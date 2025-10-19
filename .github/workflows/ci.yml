@@ -1,0 +1,76 @@
+name: Scraping Project CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  quality-check:
+    name: Code Quality & Setup Verification
+    runs-on: ubuntu-latest
+    
+    steps:
+    # STEP 1: Get the code on Github
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    # STEP 2: Setup Node.js environment for project
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    # STEP 3: Install dependencies
+    - name: Install dependencies
+      run: npm ci
+      
+    # STEP 4: Verify script syntax
+    - name: Check JavaScript syntax
+      run: |
+        echo "Checking syntax of main files..."
+        node -c run.js
+        node -c src/iridium.js
+        node -c src/satellite.js
+        node -c src/utils.js
+        echo "All files have valid syntax!"
+        
+    # STEP 5: Test dependency loading
+    - name: Verify dependencies load
+      run: |
+        echo "Testing if dependencies can be loaded..."
+        node -e "
+          try {
+            const cheerio = require('cheerio');
+            const request = require('request');
+            console.log('All dependencies load successfully');
+          } catch (error) {
+            console.error('Dependency loading failed:', error);
+            process.exit(1);
+          }
+        "
+        
+    # STEP 6: Basic script validation
+    - name: Validate script structure
+      run: |
+        echo "Running basic script validation..."
+        # Check if main files exist and are readable
+        if [ ! -f run.js ]; then
+          echo "run.js not found!"
+          exit 1
+        fi
+        if [ ! -f package.json ]; then
+          echo "package.json not found!"
+          exit 1
+        fi
+        echo "Project structure is valid"
+        
+    # STEP 7: Security check (basic)
+    - name: Security audit
+      run: npm audit --audit-level moderate || true
+      
+    # STEP 8: Final success message
+    - name: CI Complete
+      run: echo " Continuous Integration passed! The scraping project is setup correctly."
