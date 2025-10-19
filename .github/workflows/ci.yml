@@ -45,4 +45,10 @@ jobs:
           [ -f run.js ] && echo "✅ run.js exists" || echo "❌ run.js missing"
           echo "📁 Project structure seems OK"
 
+       # STEP 6: Run tests
+      - name: Run tests
+        run: |
+          echo "Running Jest tests..."
+          npm test -- --passWithNoTests
+
  
