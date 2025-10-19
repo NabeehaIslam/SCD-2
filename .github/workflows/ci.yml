@@ -1,7 +1,9 @@
-name: Basic CI Test
+name: Continuous Integration
 
 on:
   push:
+    branches: [ main ]
+  pull_request:
     branches: [ main ]
 
 jobs:
@@ -10,35 +12,37 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    # STEP 1: Get the code
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      # STEP 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
       
-    # STEP 2: Debug - Show what files we have
-    - name: Explore project structure
-      run: |
-        echo "=== LISTING ALL FILES ==="
-        find . -type f -name "*.js" | head -20
-        echo "=== CHECKING KEY FILES ==="
-        ls -la run.js src/ package.json || echo "Some files might be missing"
+      # STEP 2: Explore project structure
+      - name: Explore project structure
+        run: |
+          echo "=== LISTING ALL FILES ==="
+          find . -type f -name "*.js" | head -20
+          echo "=== CHECKING KEY FILES ==="
+          ls -la run.js src/ package.json || echo "Some files might be missing"
         
-    # STEP 3: Setup Node.js
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '16' # Use older version for compatibility
-        cache: 'npm'
+      # STEP 3: Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '16'
+          cache: 'npm'
     
-    # STEP 4: Just install dependencies (don't run anything)
-    - name: Install dependencies only
-      run: |
-        npm install
-        echo "✅ Dependencies installed successfully"
+      # STEP 4: Install dependencies only
+      - name: Install dependencies
+        run: |
+          npm install
+          echo "✅ Dependencies installed successfully"
         
-    # STEP 5: Simple file existence check
-    - name: Check essential files
-      run: |
-        echo "Checking for essential files..."
-        [ -f package.json ] && echo "✅ package.json exists" || echo "❌ package.json missing"
-        [ -f run.js ] && echo "✅ run.js exists" || echo "❌ run.js missing"
-        echo "📁 Project structure seems OK"
+      # STEP 5: Simple file existence check
+      - name: Check essential files
+        run: |
+          echo "Checking for essential files..."
+          [ -f package.json ] && echo "✅ package.json exists" || echo "❌ package.json missing"
+          [ -f run.js ] && echo "✅ run.js exists" || echo "❌ run.js missing"
+          echo "📁 Project structure seems OK"
+
+ 
