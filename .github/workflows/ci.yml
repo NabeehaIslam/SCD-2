@@ -45,6 +45,12 @@ jobs:
           [ -f run.js ] && echo "✅ run.js exists" || echo "❌ run.js missing"
           echo "📁 Project structure seems OK"
 
+      #ES LINT RUN TO CHECK ISSUES
+      - name: Run ESLint
+        run: |
+          echo "Running ESLint..."
+          npm run lint
+
        # STEP 6: Run tests
       - name: Run tests
         run: |
